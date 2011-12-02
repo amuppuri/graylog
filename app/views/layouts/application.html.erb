@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+  <title>Graylog2</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <%= csrf_meta_tag %>
+  <%= stylesheet_link_tag "reset" %>
+  <%= stylesheet_link_tag "core" %>
+  <%= stylesheet_link_tag "sections" %>
+  <%= stylesheet_link_tag "messages" %>
+  <%= javascript_include_tag "jquery-1.4.2.min" %>
+  <%= javascript_include_tag "jquery.autocomplete.min" %>
+  <%= javascript_include_tag "jquery.numeric" %>
+  <%= javascript_include_tag "jquery.mapkey.min" %>
+  <%= javascript_include_tag "jquery.simplemodal.min" %>
+  <%= javascript_include_tag "jquery.sparkline.min" %>
+  <%= javascript_include_tag("jit") if @load_jit %>
+  <% if @load_flot %>
+    <%= javascript_include_tag("jquery.flot.min") %>
+    <%= javascript_include_tag("jquery.flot.selection.min") %>
+  <% end %>
+  <%= javascript_include_tag "backtotop" if @use_backtotop %>
+  <%= javascript_include_tag "application" %>
+  <%= javascript_include_tag "rails" %>
+</head>
+<body>
+
+  <div id="pageload" style="display: none;"><%= Time.now.to_i %></div>
+  <div id="gln" style="display: none;">&nbsp;Loading&hellip;</div>
+
+  <div id="modal-stream-chooser" style="display: none;"><%= render :partial => "modals/stream_chooser" %></div>
+  <div id="modal-host-chooser" style="display: none;"><%= render :partial => "modals/host_chooser" %></div>
+
+  <div id="back-to-top">Back to top</div>
+
+  <% unless flash[:notice].blank? %>
+    <div id="notification-notice" class="notification notification-flash">
+      <span class="notification-title">Success!</span>
+      <%=raw flash[:notice] %>
+    </div>
+  <% end %>
+
+  <% unless flash[:error].blank? %>
+    <div id="notification-error" class="notification notification-flash">
+      <span class="notification-title">Error!</span>
+      <%=raw flash[:error] %>
+    </div>
+  <% end %>
+
+  <% if ServerValue.ping < 65.seconds.ago %>
+    <div id="server-not-running" class="notification">
+      <span class="notification-title">Warning!</span> It seems like your Graylog2 server is not running.
+    </div>
+  <% end %>
+
+  <div id="top">
+    <div id="userbar">
+      Logged in as <%= current_user.login %> &nbsp;<%= link_to "(Log out)", logout_path %>
+    </div>
+    <%= link_to image_tag("graylog.png", :id => "toplogo"), (permitted_to?(:index, :messages) ? messages_path : streams_path)%>
+    <ul id="topmenu">
+      <% current_user.role == "admin" and permitted_to? :index, :messages do %><%=raw menu_item("Messages", messages_path) %><% end %>
+      <% permitted_to? :index, :streams do %><%=raw menu_item("Streams", streams_path) %><% end %>
+      <% permitted_to? :index, :analytics do %><%=raw menu_item("Analytics", analytics_path) %><% end %>
+      <% permitted_to? :index, :hosts do %><%=raw menu_item("Hosts", hosts_path) %><% end %>
+      <% permitted_to? :index, :blacklists do %><%=raw menu_item("Blacklists", blacklists_path) %><% end %>
+      <% permitted_to? :index, :settings do %><%=raw menu_item("Settings", settings_path) %><% end %>
+      <% permitted_to? :index, :users do %><%=raw menu_item("Users", users_path) %><% end %>
+    </ul>
+
+    <div id="new-message-count">
+      <% unless @hide_stats %>
+        <strong><%= Message.count_of_last_minutes(message_count_interval) %></strong> / <%=h message_count_interval %> minutes
+      <% end %>
+    </div>
+  </div>
+
+  <br style="clear: both;" />
+  <div id="new-messages-bar" style="display: none;"></div>
+
+  <div id="content-top">
+    <div id="content-tabs">
+  <% (messages_tabs | hostgroup_tabs | stream_tabs).each do |tab| %>
+	  <%= raw tab_link(tab)%>
+	<% end %>
+      <br style="clear: both;" />
+    </div>
+  </div>
+
+ <% if @has_sidebar %>
+  <div id='main-left'>
+ <% end %>
+
+  <div id="content" <%=raw @content_class.blank? ? '' : 'class="content-' + @content_class + '"' %>>
+    <div id="content-inner">
+      <%= yield %>
+    </div>
+
+    <div class="content-bottom">
+      <div class="content-bottom-left"><%= image_tag "contentedge_l.png" %></div>
+      <div class="content-bottom-right"><%= image_tag "contentedge_r.png" %></div>
+      <br style="clear: both;">
+    </div>
+  </div>
+
+  <% if @has_sidebar %>
+    </div>
+    <div id="main-right">
+      <div id="sidebar">
+        <a href="#" id="sidebar-hide-link" title="Close sidebar">x</a>
+        <div id="sidebar-inner">
+          <%= yield :sidebar %>
+        </div>
+
+        <div class="content-bottom content-bottom-sidebar">
+          <div class="content-bottom-left"><%= image_tag "contentedge_l.png" %></div>
+          <div class="content-bottom-right"><%= image_tag "contentedge_r.png" %></div>
+          <br style="clear: both;">
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <br style="clear: both;" /><br />
+</body>
+</html>

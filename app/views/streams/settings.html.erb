@@ -1,0 +1,67 @@
+<h1>Settings of stream <span class="highlighted"><%= @stream.title %></span></h1>
+
+<h2>General</h2>
+<div class="short-description">All these settings are only applied for your user.</div>
+
+<%=raw ajaxtrigger(:favorite, "Favorite", togglefavorited_stream_path(@stream), @stream.favorited?(current_user)) %>
+<br />
+
+<%=raw ajaxtrigger(:alarm, "Receive alarms of this stream", toggle_alertedstream_path(@stream), @stream.alerted?(current_user) ) %> <%= tooltip("Notifications") %>
+<br />
+
+<%=raw ajaxtrigger(:subscribe, "Subscribe to stream", togglesubscription_stream_path(@stream), @stream.subscribed?(current_user) ) %> <%= tooltip("Notifications") %>
+<br /><br />
+
+<h2>Alarms</h2>
+<div class="short-description">An alarm is triggered when the number of messages in the defined timespan
+is higher than the maximum. All users who enabled receiving of alerts will be notified
+of the alarm. You can also define that all users are alarmed, no matter what they defined. <%= tooltip("Notifications") %></div>
+
+<%=raw ajaxtrigger(:active, "Active", togglealarmactive_stream_path(@stream), @stream.alarm_active) %>
+<br />
+
+<%=raw ajaxtrigger(:allusers, "Force for all users", togglealarmforce_stream_path(@stream), @stream.alarm_force) %>
+<br /><br />
+
+<%= form_tag setalarmvalues_stream_path(@stream) do %>
+  <%= label_tag :limit, "Maximum number of messages:" %>
+  <%= text_field_tag :limit, @stream.alarm_limit, :id => "streams-alerts-limit" %> &nbsp;
+
+  <%= label_tag :timespan, "Minutes:" %>
+  <%= text_field_tag :timespan, @stream.alarm_timespan, :id => "streams-alerts-timespan" %> &nbsp;
+
+  <%= submit_tag "Save" %>
+<% end %>
+<br />
+
+<h2>Category</h2>
+<%= form_tag categorize_stream_path(:stream_id => @stream) do %>
+  <%= label_tag 'streamcategory_id', 'Category:' %>
+  <%= hidden_field_tag :stream_id, @stream.id%>
+  <%= select_tag(:streamcategory_id,
+      (options_from_collection_for_select(Streamcategory.all, "id", "title", 0) + raw("<option value='0' selected='selected'>Uncategorized</option>"))) %>
+  <%= submit_tag 'Set category' %>
+<% end %>
+
+<% if @stream.streamcategory.blank? %>
+  Currently in no category.
+<% else %>
+  Currently in category <span class="highlighted"><%= @stream.streamcategory.title %></span>.
+<% end %>
+<br /><br />
+
+<h2>Rename stream</h2>
+<%= form_tag rename_stream_path(:stream_id => @stream) do %>
+  <%= label_tag 'title', 'New name:' %>
+  <%= text_field_tag 'title' %>
+  <%= hidden_field_tag :stream_id, @stream.id%>
+  <%= submit_tag 'Rename' %>
+<% end %>
+<br />
+
+<% if Configuration.allow_deleting %>
+<%= awesome_link "Delete all messages hit by this stream", deletebystream_messages_path(:stream_id => @stream.id), :confirm => "Really delete the messages?", :method => :post %>
+<br /><br />
+<% end %>
+
+<%= awesome_link "Delete this stream", stream_path(@stream.id), :confirm => "Really delete this stream?", :method => :delete %>

@@ -1,0 +1,46 @@
+<% message_length = Setting.get_message_length(current_user) %>
+
+<table class="messages<%= defined?(@inline_version) ? " messages-inline" : nil %>">
+  <thead>
+    <tr>
+      <th class="messages-c-date">Date</th>
+      <th class="messages-c-host">Host</th>
+      <th class="messages-c-severity">Severity</th>
+      <th class="messages-c-facility">Facility</th>
+      <th>Message</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% i = 0 %>
+    <% @messages.each do |message|  %>
+      <tr id="<%= message.id %>" class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %> message-row <%= "highlighted" if message.id.to_s == params[:message_id] %>">
+        <td><%= gl_date(Time.at(message.created_at.to_i).to_s) %></td>
+        <td><%= message.host.blank? ? nil : h(message.host) %></td>
+        <td><%= syslog_level_to_human(message.level) %></td>
+        <td><%= message.facility %></td>
+        <td>
+          <% unless message.message.blank? %>
+            <%= message.message[0..message_length] %>
+            <%=raw (message.message.length > message_length) && !defined?(dont_show_links) ? "<span class='light'>...</span>" : nil %>
+          <% end %>
+        </td>
+      </tr>
+      <% i+=1 %>
+    <% end %>
+  </tbody>
+</table>
+
+<% unless defined? inline_version %>
+<div id="messages-bottom">
+  <% append_params = Array.new if !defined?(append_params) or append_params.blank? %>
+  <% unless current_page <= 1 %>
+    <%= link_to "previous page", params.merge(:page => previous_page), :class => "previous-page" %>
+  <% end %>
+
+  <% if total_messages > (Message::LIMIT*current_page) %>
+    <%= link_to "next page", params.merge(:page => next_page), :class => "next-page" %>
+  <% end %>
+</div>
+
+<br style="clear: both;" />
+<% end %>
