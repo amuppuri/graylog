@@ -31,14 +31,6 @@ $(document).ready(function(){
         return false;
       }
 
-      vals = [
-        "Releasing gorillas",
-        "Mounting party hats",
-        "Enraging gorillas",
-        "Preparing gorilla party"
-      ]
-
-      button.html(vals[Math.floor(Math.random() * vals.length)] + "...");
       button.addClass("submit-disabled");
 
       $(this).submit();
