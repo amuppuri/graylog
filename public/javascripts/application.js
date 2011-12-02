@@ -130,7 +130,7 @@ $(document).ready(function(){
       {
         type: "line",
         width: "40px",
-        lineColor: "#fd0c99",
+        lineColor: "#3079D0",
         fillColor: "#fdd",
         spotColor: false,
         minSpotColor: false,
@@ -145,7 +145,7 @@ $(document).ready(function(){
         type: "line",
         width: "70px",
         height: "23px",
-        lineColor: "#fd0c99",
+        lineColor: "#3079D0",
         fillColor: "#fdd",
         spotColor: false,
         minSpotColor: false,

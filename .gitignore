@@ -1,5 +1,7 @@
 log/*
 tmp/*
+*.swp
+*.swo
 
 nbproject/*
 .idea
