@@ -1,1 +1,3 @@
-This is Graylog2 - Please see http://www.graylog2.org/ for more information and documentation. Thank you.
+This is fork of Graylog2 - Please see http://www.graylog2.org/ for more information and documentation.
+
+It uses a different (blue-based) theme for the UI and some minor UI tweaks.
