@@ -7,6 +7,12 @@ class Configuration
   @livetail_config = @general_config['livetail']
   @app_config = @general_config['app']
 
+
+  def self.app_name
+    return "graylog" if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['app_name'].blank?
+    return @general_config['general']['app_name']
+  end
+
   def self.external_hostname
     return "localhost" if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['external_hostname'].blank?
     return @general_config['general']['external_hostname']
